@@ -10,3 +10,9 @@ There should be local instance of elastic search and Kibana running.
 - Upload the JSON report via postman collection and inserts the data in elastic search.
 - Fetch the arrays of report from the elastic search based on the criteria.
 
+```
+curl --location 'http://localhost:8888/api/v1/upload' \
+--header 'Content-Type: application/vnd.ms-excel' \
+--form 'file=@"/C:/Users/320086435/Downloads/dashboard_export.json"'
+
+```
