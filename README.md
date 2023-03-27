@@ -16,3 +16,9 @@ curl --location 'http://localhost:8888/api/v1/upload' \
 --form 'file=@"/C:/Users/320086435/Downloads/dashboard_export.json"'
 
 ```
+
+
+```
+curl --location 'http://localhost:8888/api/v1/fetchAll'
+
+```
