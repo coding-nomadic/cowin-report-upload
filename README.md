@@ -12,7 +12,6 @@ There should be local instance of elastic search and Kibana running.
 
 ```
 curl --location 'http://localhost:8888/api/v1/upload' \
---header 'Content-Type: application/vnd.ms-excel' \
 --form 'file=@"/C:/Users/320086435/Downloads/dashboard_export.json"'
 
 ```
