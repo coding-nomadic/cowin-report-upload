@@ -1,6 +1,6 @@
 # cowin-report-service
 
-This is the dashboard report that we get from the cowin official website.
+This is the dashboard report that we get from the cowin official website.We upload the data to elastic search and expose APIs.
 
 ## Pre-requisites -
 There should be local instance of elastic search and Kibana running.
