@@ -22,3 +22,8 @@ curl --location 'http://localhost:8888/api/v1/upload' \
 curl --location 'http://localhost:8888/api/v1/fetchAll'
 
 ```
+
+```
+curl --location 'http://localhost:8888/api/v1/fetchAll/last30DaysAefiReported'
+
+```
