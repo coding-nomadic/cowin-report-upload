@@ -12,7 +12,7 @@ There should be local instance of elastic search and Kibana running.
 
 ```
 curl --location 'http://localhost:8888/api/v1/upload' \
---form 'file=@"/C:/Users/320086435/Downloads/dashboard_export.json"'
+--form 'file=@"/C:/Users/tenzin-PC/Downloads/dashboard_export.json"'
 
 ```
 
