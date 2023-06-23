@@ -1,6 +1,6 @@
 # cowin-report-service
 
-This is the dashboard report that we get from the cowin official website.We upload the data to elastic search and expose APIs.
+This is the dashboard report that we get from the cowin official website.We upload the data to elastic search and expose APIs. This application is event driven in nature. The message object will be passed to a sync event which is done with Spring Events and listener will get the message and store in elastic server.
 
 ## Pre-requisites -
 There should be local instance of elastic search and Kibana running.
