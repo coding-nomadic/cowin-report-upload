@@ -5,21 +5,27 @@ import com.example.cowinreportservice.testingunit.service.ReportJsonService;
 import com.example.cowinreportservice.testingunit.utils.JsonRetrieval;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping(value = ReportJsonConstants.API_VERSION)
+@RequestMapping(ReportJsonConstants.API_VERSION + ReportJsonConstants.FETCH)
 public class ReportJsonFetchController {
 
-    @Autowired
-    private ReportJsonService reportJsonService;
+    private final ReportJsonService reportJsonService;
 
-    /** fetches JSON message from elastic search DB **/
-    @GetMapping(path = ReportJsonConstants.FETCH)
-    public Object readFile(@PathVariable("type") String type) {
+    @Autowired
+    public ReportJsonFetchController(ReportJsonService reportJsonService) {
+        this.reportJsonService = reportJsonService;
+    }
+
+    /**
+     * Fetches JSON message from elastic search DB based on the provided type.
+     *
+     * @param type The type of JSON data to retrieve.
+     * @return Object representing the JSON data.
+     */
+    @GetMapping("/{type}")
+    public Object fetchJsonData(@PathVariable("type") String type) {
         return JsonRetrieval.getObject(type, reportJsonService.readBulkReport());
     }
 }
