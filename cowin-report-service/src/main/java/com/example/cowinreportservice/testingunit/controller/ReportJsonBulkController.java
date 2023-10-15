@@ -4,40 +4,48 @@ import com.example.cowinreportservice.testingunit.constants.ReportJsonConstants;
 import com.example.cowinreportservice.testingunit.events.EventPublisher;
 import com.example.cowinreportservice.testingunit.models.JsonRoot;
 import com.example.cowinreportservice.testingunit.service.ReportJsonService;
-import com.example.cowinreportservice.testingunit.utils.JsonUtils;
 import com.example.cowinreportservice.testingunit.utils.TransformUtils;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 @RestController
-@RequestMapping(value = ReportJsonConstants.API_VERSION)
+@RequestMapping(ReportJsonConstants.API_VERSION)
 public class ReportJsonBulkController {
 
-    @Autowired
-    private EventPublisher eventPublisher;
+    private final EventPublisher eventPublisher;
+    private final ReportJsonService reportJsonService;
 
     @Autowired
-    private ReportJsonService reportJsonService;
+    public ReportJsonBulkController(EventPublisher eventPublisher, ReportJsonService reportJsonService) {
+        this.eventPublisher = eventPublisher;
+        this.reportJsonService = reportJsonService;
+    }
 
-    /** sends JSON message to event **/
+    /**
+     * Sends JSON message to event.
+     *
+     * @param file The uploaded file.
+     * @return ResponseEntity with HTTP status code 201 if successful.
+     */
     @PostMapping(ReportJsonConstants.UPLOAD_PATH)
     public ResponseEntity<Void> uploadFile(@RequestParam("file") MultipartFile file) {
-        eventPublisher.publishEvent(TransformUtils.toString(file));
-        return new ResponseEntity<>(HttpStatus.CREATED);
+        String jsonString = TransformUtils.toString(file);
+        eventPublisher.publishEvent(jsonString);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
-    /** fetches JSON message from elastic search DB **/
+    /**
+     * Fetches JSON message from elastic search DB.
+     *
+     * @return ResponseEntity containing the JSON data with HTTP status code 200 if successful.
+     */
     @GetMapping(ReportJsonConstants.FETCH_PATH)
-    public ResponseEntity<JsonRoot> readFile() {
-        return new ResponseEntity<>(reportJsonService.readBulkReport(), HttpStatus.OK);
+    public ResponseEntity<JsonRoot> fetchBulkReport() {
+        JsonRoot jsonRoot = reportJsonService.readBulkReport();
+        return ResponseEntity.ok(jsonRoot);
     }
-
 }
