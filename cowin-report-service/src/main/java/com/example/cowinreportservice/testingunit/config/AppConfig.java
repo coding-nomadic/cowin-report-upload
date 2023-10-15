@@ -1,36 +1,49 @@
 package com.example.cowinreportservice.testingunit.config;
 
 import com.example.cowinreportservice.testingunit.models.ElasticSearchDetails;
-
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.client.RestTemplate;
 
 @Configuration
-@ConfigurationProperties(prefix = "config")
 public class AppConfig {
 
-    @Value("${config.elastic-url}")
-    private String elasticUrl;
-    @Value("${config.elastic-port}")
-    private String elasticPort;
-    @Value("${config.elastic-protocol}")
-    private String elasticProtocol;
-    @Value("${config.type-name}")
-    private String typeName;
+    private final String elasticUrl;
+    private final String elasticPort;
+    private final String elasticProtocol;
+    private final String typeName;
 
-    @Bean
-    public ElasticSearchDetails elasticSearchDetails() {
-        ElasticSearchDetails elasticSearchDetails = new ElasticSearchDetails();
-        elasticSearchDetails.setElasticPort(elasticPort);
-        elasticSearchDetails.setElasticProtocol(elasticProtocol);
-        elasticSearchDetails.setElasticUrl(elasticUrl);
-        elasticSearchDetails.setTypeName(typeName);
-        return elasticSearchDetails;
+    public AppConfig(
+            @Value("${config.elastic-url}") String elasticUrl,
+            @Value("${config.elastic-port}") String elasticPort,
+            @Value("${config.elastic-protocol}") String elasticProtocol,
+            @Value("${config.type-name}") String typeName) {
+        this.elasticUrl = elasticUrl;
+        this.elasticPort = elasticPort;
+        this.elasticProtocol = elasticProtocol;
+        this.typeName = typeName;
     }
 
+    /**
+     * Bean for ElasticSearchDetails.
+     *
+     * @return ElasticSearchDetails bean.
+     */
+    @Bean
+    public ElasticSearchDetails elasticSearchDetails() {
+        ElasticSearchDetails details = new ElasticSearchDetails();
+        details.setElasticPort(elasticPort);
+        details.setElasticProtocol(elasticProtocol);
+        details.setElasticUrl(elasticUrl);
+        details.setTypeName(typeName);
+        return details;
+    }
+
+    /**
+     * Bean for RestTemplate.
+     *
+     * @return RestTemplate bean.
+     */
     @Bean
     public RestTemplate restTemplate() {
         return new RestTemplate();
