@@ -6,50 +6,65 @@ import com.example.cowinreportservice.testingunit.models.ElasticSearchDetails;
 import com.example.cowinreportservice.testingunit.models.JsonRoot;
 import com.example.cowinreportservice.testingunit.models.Root;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import lombok.extern.slf4j.Slf4j;
-
 @Service
 @Slf4j
 public class ReportJsonService {
 
-    @Autowired
-    private RestTemplate restTemplate;
+    private final RestTemplate restTemplate;
+    private final ElasticSearchDetails elasticSearchDetails;
 
     @Autowired
-    private ElasticSearchDetails elasticSearchDetails;
+    public ReportJsonService(RestTemplate restTemplate, ElasticSearchDetails elasticSearchDetails) {
+        this.restTemplate = restTemplate;
+        this.elasticSearchDetails = elasticSearchDetails;
+    }
 
-    /** reads bulk report **/
+    /**
+     * Reads bulk report from ElasticSearch.
+     *
+     * @return JsonRoot representing the bulk report.
+     */
     public JsonRoot readBulkReport() {
         try {
             final UriComponents uriComponents = UriComponentsBuilder.newInstance()
-                                            .scheme(elasticSearchDetails.getElasticProtocol())
-                                            .host(elasticSearchDetails.getElasticUrl())
-                                            .port(elasticSearchDetails.getElasticPort())
-                                            .path(ReportJsonConstants.COWIN + "/" + "_search").build();
-            final ResponseEntity<Root> json = restTemplate.exchange(uriComponents.toString(), HttpMethod.GET,
-                                            getHttpEntity(), Root.class);
-            if (json.getBody() != null) {
-                return json.getBody().getHits().getHits().get(0).get_source();
+                    .scheme(elasticSearchDetails.getElasticProtocol())
+                    .host(elasticSearchDetails.getElasticUrl())
+                    .port(elasticSearchDetails.getElasticPort())
+                    .path(ReportJsonConstants.COWIN + "/_search").build();
+
+            ResponseEntity<Root> response = restTemplate.exchange(
+                    uriComponents.toString(),
+                    HttpMethod.GET,
+                    getHttpEntity(),
+                    Root.class);
+
+            if (response.getBody() != null) {
+                return response.getBody().getHits().getHits().get(0).getSource();
             }
         } catch (Exception exception) {
-            log.error(exception.getLocalizedMessage());
-            throw new ReportJsonException("Error occurred while fetching from elastic search DB", "102");
+            handleException(exception);
         }
         return new JsonRoot();
     }
 
-    /** get the Http Entity **/
+    private void handleException(Exception exception) {
+        log.error(exception.getLocalizedMessage());
+        throw new ReportJsonException("Error occurred while fetching from elastic search DB", "102");
+    }
+
+    /**
+     * Get the Http Entity with JSON content type.
+     *
+     * @return HttpEntity<String> with JSON content type.
+     */
     private HttpEntity<String> getHttpEntity() {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
